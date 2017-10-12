@@ -1,2 +1,2 @@
 # nessan-iod
-Initial orbit determination
+Initial orbit determination, based on astropy and poliastro
