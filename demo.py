@@ -41,13 +41,10 @@ def demo():
     site, epochs, angles = load_data('./Week2/obs1.dat')
     indices = np.arange(0, epochs.size, 1)
 
-    from time import clock
-    time = [clock()]
     orbit, residual = iod.iod_with_angles(epochs[indices],
                                           angles[indices],
                                           site)
-    time.append(clock())
-    print(time)
+
     print('Orbital elements:')
     print('   a: ', orbit.coe()[0])
     print(' ecc: ', orbit.coe()[1])
