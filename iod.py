@@ -79,6 +79,7 @@ def main():
     ax.hist(residual[:, 1], bins=60, normed=True)
     ax.grid(True)
     plt.show()
+    
 
 
 if __name__ == "__main__":
