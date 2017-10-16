@@ -33,7 +33,7 @@ def load_data(filename):
     return site, epochs, Angle(angles * u.deg)
 
 
-def main():
+def demo():
     import nessan_iod as iod
     print()
     print('obs3:')
@@ -82,6 +82,6 @@ def main():
     
 
 if __name__ == "__main__":
-    main()
+    demo()
 
 

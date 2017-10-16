@@ -43,7 +43,6 @@ def greenwich_sidereal_time(ut1_time=None):
     return gmst, gast
 
 
-
 def precession_angle(ut1_time=None):
     """
     Generates precession angles.
