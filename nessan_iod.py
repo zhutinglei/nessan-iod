@@ -7,6 +7,9 @@ from astropy.coordinates.earth_orientation import rotation_matrix
 from astropy.coordinates.earth_orientation import matrix_product
 from poliastro.twobody import Orbit
 
+from astropy.utils.iers import IERS
+iers_table = IERS.open('eopc04_08_IAU2000.62-now')
+
 def iod_obs_tod(location: EarthLocation, epoch: Time):
     """
     Get the true of date (tod) position-velocity vector of the observatory
@@ -23,17 +26,18 @@ def iod_obs_tod(location: EarthLocation, epoch: Time):
         Position and velocity vector of the observation, in tod frame
 
     """
-
     from astropy.coordinates.earth import OMEGA_EARTH
-    import nessan_fa as fa
+    from astropy import _erfa as erfa
     assert isinstance(location, EarthLocation)
     assert isinstance(epoch, Time)
-    gmst, gast = fa.greenwich_sidereal_time(epoch)
+
+    dut = epoch.get_delta_ut1_utc(iers_table=iers_table)
+    ut1 = Time(epoch.mjd + dut.to_value('day'), format='mjd', scale='ut1')
+    earth_rotation_angle = erfa.era00(ut1.jd1, ut1.jd2) * u.rad
     loc = location.get_itrs()
     unit = loc.x.unit
     loc = np.array([loc.x.value, loc.y.value, loc.z.value])
-
-    pos = np.matmul(rotation_matrix(-gast, 'z'), loc)
+    pos = np.matmul(rotation_matrix(-earth_rotation_angle, 'z'), loc)
     vel = [-OMEGA_EARTH.value * pos[1], OMEGA_EARTH.value * pos[0], 0.0]
     acc = [-OMEGA_EARTH.value**2 * pos[0], -OMEGA_EARTH.value**2 * pos[1], 0.0]
 
@@ -83,7 +87,7 @@ def iod_with_angles(epochs: Time, angles: Angle, location: EarthLocation):
 
     Parameters
     ----------
-    epochs: `~astropy.time.Time`
+    epochs: `~astropy.time.Time`, utc
         epochs.size should be N
     angles: `~astropy.coordinates.angles.Angle`
         angles.shape should be (N, 2), with the first column be RA and the
@@ -105,10 +109,13 @@ def iod_with_angles(epochs: Time, angles: Angle, location: EarthLocation):
     directions = coo.sph2cart(angles[:, 0].to_value(unit='rad'),
                               angles[:, 1].to_value(unit='rad'),
                               1.0)
+    from time import clock
+    t = [clock()]
     obsvectors = [
         (iod_obs_tod(location, epoch)[0]/u_length).to_value(u.one)
         for epoch in epochs
     ]
+    t.append(clock())
 
     # Add a first guess
     indices = np.array([10, 20], dtype=int)
@@ -118,8 +125,10 @@ def iod_with_angles(epochs: Time, angles: Angle, location: EarthLocation):
                                      directions[indices],
                                      obsvectors[indices])
     print(range*u_length)
-
+    t.append(clock())
     time, r, v, residual = _iod_laplace(times, directions, obsvectors, range)
+    t.append(clock())
+    print(t)
 
     epoch = epochs[0] + time * u_time
     orbit = Orbit.from_vectors(Earth, r * u_length, v * u_length/u_time, epoch)
