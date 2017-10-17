@@ -5,6 +5,8 @@ from astropy.time import Time
 from astropy.coordinates import EarthLocation
 from astropy.coordinates.angles import Angle
 
+import nessan_iod as iod
+
 
 def load_data(filename):
     with open(filename) as f:
@@ -35,7 +37,6 @@ def load_data(filename):
 
 def demo():
 
-    import nessan_iod as iod
     print()
     print('obs1:')
     site, epochs, angles = load_data('./Week2/obs1.dat')
