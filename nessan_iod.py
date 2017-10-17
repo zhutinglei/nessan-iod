@@ -109,13 +109,11 @@ def iod_with_angles(epochs: Time, angles: Angle, location: EarthLocation):
     directions = coo.sph2cart(angles[:, 0].to_value(unit='rad'),
                               angles[:, 1].to_value(unit='rad'),
                               1.0)
-    from time import clock
-    t = [clock()]
+
     obsvectors = [
         (iod_obs_tod(location, epoch)[0]/u_length).to_value(u.one)
         for epoch in epochs
     ]
-    t.append(clock())
 
     # Add a first guess
     indices = np.array([10, 20], dtype=int)
@@ -125,10 +123,7 @@ def iod_with_angles(epochs: Time, angles: Angle, location: EarthLocation):
                                      directions[indices],
                                      obsvectors[indices])
     print(range*u_length)
-    t.append(clock())
     time, r, v, residual = _iod_laplace(times, directions, obsvectors, range)
-    t.append(clock())
-    print(t)
 
     epoch = epochs[0] + time * u_time
     orbit = Orbit.from_vectors(Earth, r * u_length, v * u_length/u_time, epoch)
