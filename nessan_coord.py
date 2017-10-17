@@ -1,5 +1,6 @@
 """
     Coordinate transformations
+    This file is deprecated, use astropy.coordinates instead
 """
 
 def cart2sph(x, y, z):
