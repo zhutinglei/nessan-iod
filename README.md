@@ -4,3 +4,4 @@ Initial orbit determination, based on [*astropy*](http://www.astropy.org/) and [
 luyao
 
 zhutinglei
+$\sin^2x + \cos^2x = 1$
