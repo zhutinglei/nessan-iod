@@ -71,7 +71,7 @@ def demo():
     ax.set_xlabel('error along RA / arcsecond')
     ax.set_ylabel('error along DEC / arcsecond')
     ax.grid(True)
-
+    
     x = np.arange(-bound, bound, bound/500.0)
     m, s = stats.norm.fit(residual[:, 0])
     y = stats.norm.pdf(x, m, s)
@@ -90,6 +90,7 @@ def demo():
     ax.legend()
     ax.set_title('error along DEC')
     ax.set_xlabel('arcsecond')
+
 
     plt.show()
     
