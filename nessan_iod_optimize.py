@@ -27,7 +27,7 @@ class iod_optimize:
 
         # Step 2: calculate fitness
         #   F = sqrt(2/M/(M-1)*sum(j=0 : M-1)sum(k=j+1 : M) (f[k] - f[j] - theta(k, j))^2)
-        for j in np.arange(len(time)):
-            for k in np.arange(j+1, np.arange(len(time)):
-                print(j, k)
+        m = len(time)
+        lst = np.arange(m)
+        idx = [(i,j) for i in lst for j in np.arange(i+1, m)]
 
