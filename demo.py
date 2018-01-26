@@ -6,6 +6,9 @@ from astropy.coordinates import EarthLocation
 from astropy.coordinates.angles import Angle
 
 
+import nessan_iod as iod
+
+
 def load_data(filename):
     with open(filename) as f:
         line = f.readline()
@@ -35,7 +38,6 @@ def load_data(filename):
 
 def demo():
 
-    import nessan_iod as iod
     print()
     print('obs1:')
     site, epochs, angles = load_data('./Week2/obs1.dat')
@@ -52,34 +54,44 @@ def demo():
     print('raan: ', orbit.coe()[3])
     print('   w: ', orbit.coe()[4])
     print('   M: ', orbit.coe()[5])
+
+    residual = residual.to('arcsec')
     print('mean and std of residuals:')
-    print([np.mean(residual).to_value('deg'),
-          np.std(residual).to_value('deg')] * u.deg)
+    print([residual.mean(), residual.std()])
 
     import scipy.stats as stats
     import matplotlib.pyplot as plt
-    plt.figure(figsize=(10, 4))
+    plt.figure(figsize=(18, 8))
     ax = plt.subplot(1, 2, 1)
     ax.scatter(residual[:, 0], residual[:, 1], marker='.', edgecolor=None)
+    ax.set_aspect('equal')
     bound = 1.1 * np.max(abs(residual.to_value()))
     ax.set_xlim([-bound, bound])
     ax.set_ylim([-bound, bound])
+    ax.set_xlabel('error along RA / arcsecond')
+    ax.set_ylabel('error along DEC / arcsecond')
     ax.grid(True)
-
+    
     x = np.arange(-bound, bound, bound/500.0)
     m, s = stats.norm.fit(residual[:, 0])
     y = stats.norm.pdf(x, m, s)
     ax = plt.subplot(2, 2, 2)
-    ax.plot(x, y, '-.')
-    ax.hist(residual[:, 0], bins=60, normed=True)
+    ax.plot(x, y, '-.', label='PDF fitted by Gaussian')
+    ax.hist(residual[:, 0], bins=30, normed=True, label='histogram')
     ax.grid(True)
+    ax.set_title('error along RA')
 
     m, s = stats.norm.fit(residual[:, 1])
     y = stats.norm.pdf(x, m, s)
     ax = plt.subplot(2, 2, 4)
-    ax.plot(x, y, '-.')
-    ax.hist(residual[:, 1], bins=60, normed=True)
+    ax.plot(x, y, '-.', label='PDF fitted by Gaussian')
+    ax.hist(residual[:, 1], bins=30, normed=True, label='histogram')
     ax.grid(True)
+    ax.legend()
+    ax.set_title('error along DEC')
+    ax.set_xlabel('arcsecond')
+
+
     plt.show()
     
 
