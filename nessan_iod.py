@@ -233,7 +233,7 @@ def _iod_laplace(times, directions, obsvectors, guess_semimajor=None):
         m = np.append(f * skew_mats[i], g * skew_mats[i], axis=1)
         left_mat = np.append(left_mat, m, axis=0)
         right_vec = np.append(right_vec, np.cross(directions[i], obsvectors[i]))
-    posvel, residual = np.linalg.lstsq(left_mat, right_vec)[0:2]
+    posvel, residual = np.linalg.lstsq(left_mat, right_vec, rcond=-1)[0:2]
     r, v = posvel[0:3], posvel[3:6]
 
     max_iter = 100
@@ -247,7 +247,7 @@ def _iod_laplace(times, directions, obsvectors, guess_semimajor=None):
             left_mat = np.append(left_mat, m, axis=0)
             right_vec = np.append(right_vec,
                                   np.cross(directions[i], obsvectors[i]))
-        posvel = np.linalg.lstsq(left_mat, right_vec)[0]
+        posvel = np.linalg.lstsq(left_mat, right_vec, rcond=-1)[0]
         err_r = np.linalg.norm(r-posvel[0:3])
         err_v = np.linalg.norm((v-posvel[3:6]))
         if err_r < 1e-7 and err_v < 1e-7:

@@ -61,10 +61,12 @@ def demo():
 
     import scipy.stats as stats
     import matplotlib.pyplot as plt
-    plt.figure(figsize=(18, 8))
+    plt.figure(figsize=(16, 7))
     ax = plt.subplot(1, 2, 1)
     ax.scatter(residual[:, 0], residual[:, 1], marker='.', edgecolor=None)
+
     ax.set_aspect('equal')
+
     bound = 1.1 * np.max(abs(residual.to_value()))
     ax.set_xlim([-bound, bound])
     ax.set_ylim([-bound, bound])
@@ -77,15 +79,15 @@ def demo():
     y = stats.norm.pdf(x, m, s)
     ax = plt.subplot(2, 2, 2)
     ax.plot(x, y, '-.', label='PDF fitted by Gaussian')
-    ax.hist(residual[:, 0], bins=30, normed=True, label='histogram')
+    ax.hist(residual[:, 0].to_value(), bins=30, density=True, label='histogram')
     ax.grid(True)
     ax.set_title('error along RA')
 
-    m, s = stats.norm.fit(residual[:, 1])
+    m, s = stats.norm.fit(residual[:, 1].to_value())
     y = stats.norm.pdf(x, m, s)
     ax = plt.subplot(2, 2, 4)
     ax.plot(x, y, '-.', label='PDF fitted by Gaussian')
-    ax.hist(residual[:, 1], bins=30, normed=True, label='histogram')
+    ax.hist(residual[:, 1].to_value(), bins=30, density=True, label='histogram')
     ax.grid(True)
     ax.legend()
     ax.set_title('error along DEC')
